@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 导航助手</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ AI 导航助手</h1>
+            <p class="subtitle">语音或文本输入，自动为您导航</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-methods">
+                <button id="voiceBtn" class="voice-btn">
+                    <span class="icon">🎤</span>
+                    <span id="voiceStatus">开始录音</span>
+                </button>
+
+                <div class="text-input">
+                    <input type="text" id="textInput" placeholder="请输入导航指令，例如：从北京到上海...">
+                    <button id="sendBtn">发送</button>
+                </div>
+            </div>
+
+            <div class="recording-indicator" id="recordingIndicator" style="display: none;">
+                <div class="pulse"></div>
+                <span>正在录音...</span>
+            </div>
+        </div>
+
+        <div class="response-section">
+            <div class="status-display" id="statusDisplay">
+                <div class="status-item">
+                    <span class="status-icon">⏳</span>
+                    <span class="status-text">等待指令...</span>
+                </div>
+            </div>
+
+            <div class="result-display" id="resultDisplay" style="display: none;">
+                <h3>执行结果</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+
+        <div class="examples">
+            <h4>使用示例：</h4>
+            <div class="example-items">
+                <div class="example-item" onclick="useExample(this)">导航从北京到上海</div>
+                <div class="example-item" onclick="useExample(this)">从天安门到首都机场</div>
+                <div class="example-item" onclick="useExample(this)">帮我从公司导航回家</div>
+                <div class="example-item" onclick="useExample(this)">去最近的加油站</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

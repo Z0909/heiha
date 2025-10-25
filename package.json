@@ -1,0 +1,35 @@
+{
+  "name": "ai-navigation-assistant",
+  "version": "1.0.0",
+  "description": "AI-powered navigation assistant using MCP for computer automation",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "axios": "^1.5.0",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2",
+    "open": "^9.1.0",
+    "node-record-lpcm16": "^1.0.1",
+    "@google-cloud/speech": "^6.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "ai",
+    "navigation",
+    "mcp",
+    "automation",
+    "voice-control"
+  ],
+  "author": "AI Navigation Assistant",
+  "license": "MIT"
+}
