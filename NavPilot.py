@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-NavPilot - 智能网页地图导航助手
+NavPilot 
 基于 mcp_agent_client 的正确导入方式
 """
 
