@@ -3,7 +3,12 @@
     "allow": [
       "Bash(chmod:*)",
       "Bash(python:*)",
+<<<<<<< HEAD
       "Bash(pip install:*)"
+=======
+      "Bash(pip install:*)",
+      "Bash(pkill:*)"
+>>>>>>> newbr
     ],
     "deny": [],
     "ask": []

@@ -13,11 +13,19 @@ class Config:
 
     # 百度地图配置
     BAIDU_MAP_AK = os.getenv('BAIDU_MAP_AK')
+<<<<<<< HEAD
     BAIDU_MCP_URL = f"https://mcp.map.baidu.com/mcp?ak={BAIDU_MAP_AK}"
 
     # 高德地图配置
     AMAP_KEY = os.getenv('AMAP_KEY')
     AMAP_MCP_URL = f"https://mcp.amap.com/sse?key={AMAP_KEY}"
+=======
+    BAIDU_MCP_URL = f"https://mcp.map.baidu.com/api/v1/mcp?ak={BAIDU_MAP_AK}"
+
+    # 高德地图配置
+    AMAP_KEY = os.getenv('AMAP_KEY')
+    AMAP_MCP_URL = f"https://mcp.amap.com/api/v1/mcp?key={AMAP_KEY}"
+>>>>>>> newbr
 
     # 应用配置
     APP_HOST = os.getenv('APP_HOST', '127.0.0.1')

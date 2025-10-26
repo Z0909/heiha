@@ -1,9 +1,5 @@
 from services.deepseek_service import DeepSeekService
-<<<<<<< HEAD
-from services.map_mcp_service import MapMCPService
-=======
 from services.mcp_client import MapMCPService
->>>>>>> newbr
 
 class NavigationService:
     """导航业务逻辑服务"""

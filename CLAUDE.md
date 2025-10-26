@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
+<<<<<<< HEAD
 This is an AI导航助手 (AI Navigation Assistant) project built with Python and FastAPI. The system uses DeepSeek AI for intent recognition and integrates with Baidu Map and Amap MCP services for navigation.
+=======
+This is an AI导航助手 (AI Navigation Assistant) project built with Python and FastAPI. The system uses DeepSeek AI for intent recognition and generates web-based navigation URLs for Baidu Map and Amap services.
+>>>>>>> newbr
 
 ## Project Structure
 
@@ -17,7 +21,11 @@ This is an AI导航助手 (AI Navigation Assistant) project built with Python an
 ├── .env                   # 环境变量配置
 ├── services/              # 服务层
 │   ├── deepseek_service.py    # DeepSeek AI服务
+<<<<<<< HEAD
 │   ├── map_mcp_service.py     # 地图MCP服务
+=======
+│   ├── mcp_client.py          # 地图MCP客户端 (SSE协议)
+>>>>>>> newbr
 │   └── navigation_service.py  # 导航业务逻辑
 ├── templates/             # 前端模板
 │   └── index.html        # Web界面
@@ -54,9 +62,17 @@ python main.py
 ## Key Features
 
 - **AI Intent Recognition**: Uses DeepSeek AI to analyze navigation requests
+<<<<<<< HEAD
 - **Multi-Map Support**: Integrates with Baidu Map and Amap MCP services
 - **Text Input**: Web interface for text-based navigation requests
 - **MCP Architecture**: Built on Model Context Protocol
+=======
+- **Web-Based Maps**: Generates web URLs for Baidu Map and Amap navigation
+- **Automatic Browser Opening**: Automatically opens web maps in default browser
+- **Text Input**: Web interface for text-based navigation requests
+- **MCP Architecture**: Built on Model Context Protocol with SSE implementation
+- **Fallback Mechanism**: Local URL generation when MCP services are unavailable
+>>>>>>> newbr
 
 ## API Endpoints
 
@@ -75,4 +91,15 @@ python run.py --check     # Check environment and config
 ## Git Status
 
 - **Current Branch**: `testbranch`
+<<<<<<< HEAD
 - **Status**: Active development with complete navigation system
+=======
+- **Status**: Active development with complete web-based navigation system
+
+## Recent Updates
+
+- **Web-Based Navigation**: System now generates web URLs for Baidu Map and Amap instead of app URLs
+- **Browser Automation**: Automatically opens navigation pages in default browser
+- **Enhanced Error Handling**: Improved fallback mechanisms for service failures
+- **Updated Documentation**: All documentation reflects web-based map functionality
+>>>>>>> newbr

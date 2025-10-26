@@ -2,7 +2,19 @@
 
 ## 系统概述
 
+<<<<<<< HEAD
 AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系统，通过AI分析用户意图，自动调用地图服务进行导航。系统支持语音和文本输入，能够智能选择合适的地图服务并执行导航操作。
+=======
+AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系统，通过AI分析用户意图，自动调用地图服务进行导航。系统支持文本输入，能够智能选择合适的地图服务并自动在浏览器中打开网页版地图进行A到B的导航。
+
+### 核心特性
+- **网页版地图导航**: 在浏览器中打开百度地图或高德地图网页版
+- **自动A到B导航**: 自动进入从起点到终点的导航状态
+- **MCP协议支持**: 使用SSE协议与地图MCP服务通信
+- **智能意图识别**: 基于DeepSeek AI分析用户导航意图
+- **本地URL回退**: 当MCP服务不可用时自动生成本地网页URL
+- **智能地点选择**: 自动选择第一个匹配地点，避免多地点选择困扰
+>>>>>>> newbr
 
 ## 架构设计
 
@@ -14,15 +26,27 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
 │                 │    │                  │    │                 │
 │  • Web前端      │◄──►│  • FastAPI服务   │◄──►│  • DeepSeek API │
 │  • 文本输入     │    │  • 业务逻辑      │    │  • 意图识别     │
+<<<<<<< HEAD
 │                 │    │  • 路由管理      │    │  • 地址标准化   │
+=======
+│  • 浏览器控制   │    │  • 路由管理      │    │  • 地址标准化   │
+>>>>>>> newbr
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                                 │
                                 ▼
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+<<<<<<< HEAD
 │   执行层        │    │    地图服务      │    │   外部应用      │
 │                 │    │                  │    │                 │
 │  • 地图MCP客户端 │◄──►│  • 百度地图MCP   │◄──►│  • 百度地图     │
 │  • 服务选择器   │    │  • 高德地图MCP   │    │  • 高德地图     │
+=======
+│   执行层        │    │    地图服务      │    │   浏览器层      │
+│                 │    │                  │    │                 │
+│  • 地图MCP客户端 │◄──►│  • 百度地图MCP   │◄──►│  • 网页版地图   │
+│  • 服务选择器   │    │  • 高德地图MCP   │    │  • 自动打开     │
+│  • URL生成器    │    │  • 本地URL回退   │    │  • 导航状态     │
+>>>>>>> newbr
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
@@ -34,6 +58,11 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
   - 提供友好的Web交互界面
   - 支持文本输入框
   - 实时显示处理结果和系统状态
+<<<<<<< HEAD
+=======
+  - 浏览器导航控制
+  - URL复制和手动导航支持
+>>>>>>> newbr
 
 #### 2. 服务层 (Service Layer)
 - **技术栈**: FastAPI, Uvicorn
@@ -54,6 +83,7 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
   - 服务选择: 推荐使用的地图服务
 
 #### 4. 执行层 (Execution Layer)
+<<<<<<< HEAD
 - **技术栈**: MCP客户端
 - **核心模块**: `map_mcp_service.py`
 - **功能**:
@@ -61,6 +91,24 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
   - 高德地图MCP客户端
   - 统一的服务调用接口
 
+=======
+- **技术栈**: MCP客户端, SSE协议
+- **核心模块**: `mcp_client.py`
+- **功能**:
+  - 百度地图MCP客户端 (SSE协议)
+  - 高德地图MCP客户端 (SSE协议)
+  - 本地URL生成器 (MCP服务回退)
+  - 统一的服务调用接口
+
+#### 5. 浏览器层 (Browser Layer)
+- **技术栈**: webbrowser模块, JavaScript
+- **功能**:
+  - 自动打开网页版地图
+  - 生成网页版导航URL
+  - 浏览器窗口管理
+  - 导航状态确认
+
+>>>>>>> newbr
 ## 数据流设计
 
 ### 导航请求处理流程
@@ -72,18 +120,39 @@ sequenceDiagram
     participant API as FastAPI服务
     participant AI as DeepSeek AI
     participant MCP as 地图MCP
+<<<<<<< HEAD
     participant MAP as 地图应用
+=======
+    participant URL as URL生成器
+    participant BROWSER as 浏览器
+>>>>>>> newbr
 
     U->>UI: 输入导航指令(文本)
     UI->>API: POST /api/navigate
     API->>AI: 分析导航意图
     AI-->>API: 返回解析结果
+<<<<<<< HEAD
     API->>MCP: 调用地图导航
     MCP->>MAP: 打开地图应用
     MAP-->>MCP: 导航状态
     MCP-->>API: 执行结果
     API-->>UI: 返回处理结果
     UI-->>U: 显示导航状态
+=======
+    API->>MCP: 调用地图导航(SSE协议)
+
+    alt MCP服务可用
+        MCP-->>API: 返回导航URL
+    else MCP服务失败
+        API->>URL: 生成本地网页URL
+        URL-->>API: 返回网页版导航URL
+    end
+
+    API-->>UI: 返回处理结果
+    UI->>BROWSER: 自动打开网页版地图
+    BROWSER-->>UI: 导航页面状态
+    UI-->>U: 显示导航结果
+>>>>>>> newbr
 ```
 
 ### 核心数据结构
@@ -130,6 +199,7 @@ sequenceDiagram
 
 #### 百度地图MCP
 - **官方文档**: https://lbs.baidu.com/faq/api?title=mcpserver/quickstart
+<<<<<<< HEAD
 - **主要工具**:
   - `open_navigation`: 打开导航
   - `search_place`: 搜索地点
@@ -141,6 +211,25 @@ sequenceDiagram
   - `open_navigation`: 打开导航
   - `search_place`: 搜索地点
 - **URL格式**: `https://mcp.amap.com/sse?key=YOUR_KEY`
+=======
+- **协议**: HTTP POST with JSON-RPC 2.0
+- **主要工具**:
+  - `maps_navigation`: 地图导航
+  - `search_place`: 搜索地点
+- **URL格式**: `https://mcp.map.baidu.com/api/v1/mcp?ak=YOUR_AK`
+- **网页版URL**: `https://api.map.baidu.com/direction?origin=A&destination=B&mode=transit`
+- **状态**: MCP服务可能返回错误，系统提供本地URL回退机制
+
+#### 高德地图MCP
+- **官方文档**: https://lbs.amap.com/api/mcp-server/gettingstarted
+- **协议**: HTTP POST with JSON-RPC 2.0
+- **主要工具**:
+  - `maps_navigation`: 地图导航
+  - `search_place`: 搜索地点
+- **URL格式**: `https://mcp.amap.com/api/v1/mcp?key=YOUR_KEY`
+- **网页版URL**: `https://ditu.amap.com/dir?from[name]=A&to[name]=B&type=bus`
+- **状态**: MCP服务可能返回404错误，系统提供本地URL回退机制
+>>>>>>> newbr
 
 #### DeepSeek API
 - **官方文档**: https://api-docs.deepseek.com/zh-cn/
@@ -182,6 +271,87 @@ APP_PORT=8000
    - 访问: https://lbs.amap.com/
    - 创建应用并获取Key
 
+<<<<<<< HEAD
+=======
+## Web版地图导航实现
+
+### 网页URL生成机制
+
+#### 智能地点选择策略
+为了避免多地点选择困扰，系统采用简化URL参数策略，让地图服务自动选择第一个匹配地点：
+
+- **移除固定行政区划代码**: 不指定具体城市代码，让系统自动匹配
+- **简化参数结构**: 只保留核心导航参数，避免复杂的地图内部参数
+- **自动第一选择**: 地图服务会自动选择最匹配的第一个地点
+
+#### 百度地图网页版URL
+```python
+# 构建网页版百度地图URL - 简化参数自动选择第一个匹配地点
+url_params = {
+    "origin": origin,
+    "destination": destination,
+    "mode": transport_mode  # transit/driving/walking
+}
+query_string = urllib.parse.urlencode(url_params, encoding='utf-8')
+baidu_url = f"https://api.map.baidu.com/direction?{query_string}"
+```
+
+#### 高德地图网页版URL
+```python
+# 构建网页版高德地图URL - 简化参数自动选择第一个匹配地点
+url_params = {
+    "dateTime": "now",
+    "from[name]": origin,
+    "to[name]": destination,
+    "policy": "0",  # 默认策略
+    "type": transport_mode  # bus/car/walk
+}
+query_string = urllib.parse.urlencode(url_params, encoding='utf-8', quote_via=urllib.parse.quote)
+amap_url = f"https://ditu.amap.com/dir?{query_string}"
+```
+
+### 浏览器自动化
+系统使用Python `webbrowser`模块自动打开网页版地图：
+
+```python
+# 在浏览器中打开网页版地图
+success = webbrowser.open(url)
+
+if success:
+    return {
+        "success": True,
+        "action": "browser_opened",
+        "message": "已在浏览器中打开地图导航页面"
+    }
+else:
+    return {
+        "success": False,
+        "action": "manual_required",
+        "message": "无法自动打开地图页面，请手动复制URL"
+    }
+```
+
+### 前端导航控制
+前端JavaScript提供多种导航方式：
+
+```javascript
+// 自动打开导航
+function openNavigation(url, mapService) {
+    const newWindow = window.open(url, '_blank');
+    if (!newWindow || newWindow.closed) {
+        window.location.href = url;
+    }
+    alert(`${mapService === 'baidu_map' ? '百度地图' : '高德地图'}导航已启动！`);
+}
+
+// 复制URL到剪贴板
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text);
+    alert('URL已复制到剪贴板');
+}
+```
+
+>>>>>>> newbr
 ## 扩展性设计
 
 ### 插件化架构

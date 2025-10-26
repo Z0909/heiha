@@ -322,13 +322,9 @@
 
             if (data.success) {
                 const summary = data.summary;
-<<<<<<< HEAD
-                resultContent.innerHTML = `
-=======
                 const navigationResult = data.navigation_execution;
 
                 let resultHTML = `
->>>>>>> newbr
                     <div class="result-item result-success">
                         <strong>🎉 导航成功！</strong><br>
                         <strong>起点：</strong>${summary.origin}<br>
@@ -340,8 +336,6 @@
                         <strong>用户输入：</strong>${data.user_input}
                     </div>
                 `;
-<<<<<<< HEAD
-=======
 
                 // 显示导航URL和操作指导
                 if (navigationResult && navigationResult.url) {
@@ -389,7 +383,6 @@
                 }
 
                 resultContent.innerHTML = resultHTML;
->>>>>>> newbr
             } else {
                 resultContent.innerHTML = `
                     <div class="result-item result-error">
@@ -401,8 +394,6 @@
             }
         }
 
-<<<<<<< HEAD
-=======
         // 打开导航
         function openNavigation(url, mapService) {
             try {
@@ -445,7 +436,6 @@
             }
         }
 
->>>>>>> newbr
         // 回车键触发导航
         document.getElementById('navInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
