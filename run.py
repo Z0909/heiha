@@ -16,8 +16,7 @@ async def check_dependencies():
     print("🔍 检查依赖包...")
 
     required_packages = [
-        'fastapi', 'uvicorn', 'python-dotenv', 'requests',
-        'speechrecognition', 'pyaudio', 'websockets', 'jinja2'
+        'fastapi', 'uvicorn', 'python-dotenv', 'requests', 'jinja2'
     ]
 
     missing_packages = []
@@ -158,13 +157,13 @@ AI导航助手 - 使用说明
 功能:
   • 智能导航: 基于AI的意图识别和地址标准化
   • 多地图支持: 百度地图和高德地图
-  • 语音输入: 支持语音指令
+  • 文本输入: 支持文本指令
   • Web界面: 友好的用户交互界面
 
 配置说明:
   1. 编辑 .env 文件配置API密钥
   2. 确保已安装 requirements.txt 中的依赖
-  3. 需要网络连接和麦克风(语音功能)
+  3. 需要网络连接
 
 API密钥获取:
   • DeepSeek: https://platform.deepseek.com/

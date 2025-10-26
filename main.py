@@ -9,7 +9,6 @@ import asyncio
 
 from config import Config
 from services.navigation_service import NavigationService
-from services.voice_service import voice_service
 
 # 创建FastAPI应用
 app = FastAPI(title="AI导航助手", description="基于MCP的智能导航系统")
@@ -51,32 +50,6 @@ async def get_status():
     except Exception as e:
         return {"status": "异常", "error": str(e)}
 
-@app.post("/api/voice/start")
-async def start_voice_listening():
-    """开始语音监听"""
-    try:
-        voice_service.start_listening()
-        return {"success": True, "message": "语音监听已启动"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-@app.post("/api/voice/stop")
-async def stop_voice_listening():
-    """停止语音监听"""
-    try:
-        voice_service.stop_listening()
-        return {"success": True, "message": "语音监听已停止"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
-
-@app.post("/api/voice/record")
-async def record_voice():
-    """录制语音并识别"""
-    try:
-        text = voice_service.record_audio(duration=5)
-        return {"success": True, "text": text}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -131,7 +104,6 @@ async def startup_event():
 async def shutdown_event():
     """应用关闭时执行"""
     print("AI导航助手正在关闭...")
-    voice_service.stop_listening()
 
 if __name__ == "__main__":
     uvicorn.run(

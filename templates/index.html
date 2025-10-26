@@ -98,15 +98,6 @@
             color: white;
         }
 
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
 
         .btn:hover {
             transform: translateY(-2px);
@@ -193,35 +184,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        .voice-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .voice-wave {
-            display: flex;
-            gap: 2px;
-            align-items: center;
-        }
-
-        .voice-bar {
-            width: 3px;
-            background: #4facfe;
-            border-radius: 2px;
-            animation: voiceWave 1s ease-in-out infinite;
-        }
-
-        .voice-bar:nth-child(2) { animation-delay: 0.1s; }
-        .voice-bar:nth-child(3) { animation-delay: 0.2s; }
-        .voice-bar:nth-child(4) { animation-delay: 0.3s; }
-        .voice-bar:nth-child(5) { animation-delay: 0.4s; }
-
-        @keyframes voiceWave {
-            0%, 100% { height: 5px; }
-            50% { height: 20px; }
-        }
 
         .hidden {
             display: none;
@@ -232,7 +194,7 @@
     <div class="container">
         <div class="header">
             <h1>🚗 AI导航助手</h1>
-            <p>基于MCP的智能导航系统 - 支持语音和文本输入</p>
+            <p>基于MCP的智能导航系统 - 支持文本输入</p>
         </div>
 
         <div class="content">
@@ -256,21 +218,7 @@
 
                 <div class="button-group">
                     <button class="btn btn-primary" onclick="navigate()">🚗 开始导航</button>
-                    <button class="btn btn-success" onclick="startVoiceRecording()">🎤 语音输入</button>
                     <button class="btn btn-secondary" onclick="checkStatus()">🔄 检查状态</button>
-                </div>
-
-                <!-- 语音指示器 -->
-                <div id="voiceIndicator" class="voice-indicator hidden">
-                    <div class="voice-wave">
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                        <div class="voice-bar"></div>
-                    </div>
-                    <span>正在录音...请说话</span>
-                    <button class="btn btn-danger" onclick="stopVoiceRecording()">停止</button>
                 </div>
             </div>
 
@@ -283,8 +231,6 @@
     </div>
 
     <script>
-        // 全局变量
-        let isRecording = false;
 
         // 页面加载时检查状态
         document.addEventListener('DOMContentLoaded', checkStatus);
@@ -397,40 +343,6 @@
                     </div>
                 `;
             }
-        }
-
-        // 开始语音录制
-        async function startVoiceRecording() {
-            const voiceIndicator = document.getElementById('voiceIndicator');
-            voiceIndicator.classList.remove('hidden');
-            isRecording = true;
-
-            try {
-                const response = await fetch('/api/voice/record', {
-                    method: 'POST',
-                });
-
-                const data = await response.json();
-
-                if (data.success && data.text) {
-                    document.getElementById('navInput').value = data.text;
-                }
-
-            } catch (error) {
-                console.error('语音录制失败:', error);
-            } finally {
-                voiceIndicator.classList.add('hidden');
-                isRecording = false;
-            }
-        }
-
-        // 停止语音录制
-        function stopVoiceRecording() {
-            // 这里需要实现停止语音录制的逻辑
-            // 由于语音录制是同步的，这里主要是UI控制
-            const voiceIndicator = document.getElementById('voiceIndicator');
-            voiceIndicator.classList.add('hidden');
-            isRecording = false;
         }
 
         // 回车键触发导航

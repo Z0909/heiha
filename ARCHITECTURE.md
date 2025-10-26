@@ -13,8 +13,8 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
 │   用户界面层     │    │    服务层        │    │    AI服务层     │
 │                 │    │                  │    │                 │
 │  • Web前端      │◄──►│  • FastAPI服务   │◄──►│  • DeepSeek API │
-│  • 语音输入     │    │  • 业务逻辑      │    │  • 意图识别     │
-│  • 文本输入     │    │  • 路由管理      │    │  • 地址标准化   │
+│  • 文本输入     │    │  • 业务逻辑      │    │  • 意图识别     │
+│                 │    │  • 路由管理      │    │  • 地址标准化   │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                                 │
                                 ▼
@@ -33,7 +33,6 @@ AI导航助手是一个基于MCP（Model Context Protocol）的智能导航系�
 - **功能**:
   - 提供友好的Web交互界面
   - 支持文本输入框
-  - 集成语音录制功能
   - 实时显示处理结果和系统状态
 
 #### 2. 服务层 (Service Layer)
@@ -75,7 +74,7 @@ sequenceDiagram
     participant MCP as 地图MCP
     participant MAP as 地图应用
 
-    U->>UI: 输入导航指令(文本/语音)
+    U->>UI: 输入导航指令(文本)
     UI->>API: POST /api/navigate
     API->>AI: 分析导航意图
     AI-->>API: 返回解析结果
