@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI导航助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-normal {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .result-success {
+            border-left-color: #28a745;
+        }
+
+        .result-error {
+            border-left-color: #dc3545;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4facfe;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 AI导航助手</h1>
+            <p>基于MCP的智能导航系统 - 支持文本输入</p>
+        </div>
+
+        <div class="content">
+            <!-- 系统状态 -->
+            <div class="status-section">
+                <h3>系统状态</h3>
+                <div id="statusContent">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        正在检查系统状态...
+                    </div>
+                </div>
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="input-section">
+                <h3>导航指令</h3>
+                <div class="input-group">
+                    <input type="text" id="navInput" placeholder="请输入导航指令，例如：从北京天安门到上海东方明珠" />
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="navigate()">🚗 开始导航</button>
+                    <button class="btn btn-secondary" onclick="checkStatus()">🔄 检查状态</button>
+                </div>
+            </div>
+
+            <!-- 结果区域 -->
+            <div id="resultSection" class="result-section hidden">
+                <h3>导航结果</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // 页面加载时检查状态
+        document.addEventListener('DOMContentLoaded', checkStatus);
+
+        // 检查系统状态
+        async function checkStatus() {
+            const statusContent = document.getElementById('statusContent');
+            statusContent.innerHTML = '<div class="loading"><div class="spinner"></div>正在检查系统状态...</div>';
+
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                let html = '';
+                if (data.status === '正常') {
+                    html += `<div class="status-item">
+                        <span>系统状态</span>
+                        <span class="status-badge status-normal">正常</span>
+                    </div>`;
+
+                    for (const [service, status] of Object.entries(data.services)) {
+                        const badgeClass = status === '正常' ? 'status-normal' : 'status-error';
+                        html += `<div class="status-item">
+                            <span>${service}服务</span>
+                            <span class="status-badge ${badgeClass}">${status}</span>
+                        </div>`;
+                    }
+                } else {
+                    html += `<div class="status-item">
+                        <span>系统状态</span>
+                        <span class="status-badge status-error">异常</span>
+                    </div>`;
+                    html += `<div class="status-item">
+                        <span>错误信息</span>
+                        <span>${data.error}</span>
+                    </div>`;
+                }
+
+                statusContent.innerHTML = html;
+            } catch (error) {
+                statusContent.innerHTML = `<div class="status-item">
+                    <span>系统状态</span>
+                    <span class="status-badge status-error">连接失败</span>
+                </div>`;
+            }
+        }
+
+        // 处理导航请求
+        async function navigate() {
+            const input = document.getElementById('navInput');
+            const text = input.value.trim();
+
+            if (!text) {
+                alert('请输入导航指令');
+                return;
+            }
+
+            const resultSection = document.getElementById('resultSection');
+            const resultContent = document.getElementById('resultContent');
+
+            resultSection.classList.remove('hidden');
+            resultContent.innerHTML = '<div class="loading"><div class="spinner"></div>正在处理导航请求...</div>';
+
+            try {
+                const response = await fetch('/api/navigate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text }),
+                });
+
+                const data = await response.json();
+                displayResult(data);
+
+            } catch (error) {
+                resultContent.innerHTML = `
+                    <div class="result-item result-error">
+                        <strong>错误：</strong>处理请求时发生错误<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+        // 显示结果
+        function displayResult(data) {
+            const resultContent = document.getElementById('resultContent');
+
+            if (data.success) {
+                const summary = data.summary;
+                const navigationResult = data.navigation_execution;
+
+                let resultHTML = `
+                    <div class="result-item result-success">
+                        <strong>🎉 导航成功！</strong><br>
+                        <strong>起点：</strong>${summary.origin}<br>
+                        <strong>终点：</strong>${summary.destination}<br>
+                        <strong>地图服务：</strong>${summary.map_service}<br>
+                        <strong>交通方式：</strong>${summary.transport_mode}
+                    </div>
+                    <div class="result-item">
+                        <strong>用户输入：</strong>${data.user_input}
+                    </div>
+                `;
+
+                // 显示导航URL和操作指导
+                if (navigationResult && navigationResult.url) {
+                    const action = navigationResult.action || 'manual_required';
+                    const message = navigationResult.message || '导航URL已生成';
+
+                    let guidanceText = '';
+
+                    if (action === 'browser_opened') {
+                        guidanceText = '🌐 已在浏览器中打开导航页面，请在地图页面中确认导航路线';
+                    } else if (action === 'app_opened') {
+                        guidanceText = '✅ 地图应用已自动打开，请在地图中确认导航路线';
+                    } else {
+                        guidanceText = `
+                            🌐 <strong>自动打开网页版地图</strong><br>
+                            • 系统将尝试自动在浏览器中打开${summary.map_service === 'baidu_map' ? '百度地图' : '高德地图'}导航页面<br>
+                            • 如果浏览器未自动打开，请手动复制URL在浏览器中打开<br>
+                            • 您也可以点击"立即导航"按钮直接打开
+                        `;
+                    }
+
+                    resultHTML += `
+                        <div class="result-item">
+                            <strong>${message}</strong><br>
+                            <div style="margin-top: 10px;">
+                                <strong>导航URL：</strong>
+                                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 5px 0; font-size: 12px; word-break: break-all;">
+                                    ${navigationResult.url}
+                                </div>
+                                <div class="map-controls">
+                                    <button class="btn btn-primary" onclick="openNavigation('${navigationResult.url}', '${summary.map_service}')">
+                                        🚗 立即导航
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="copyToClipboard('${navigationResult.url}')">
+                                        📋 复制URL
+                                    </button>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border-radius: 5px; border-left: 4px solid #4facfe;">
+                                <strong>操作指导：</strong><br>
+                                ${guidanceText}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                resultContent.innerHTML = resultHTML;
+            } else {
+                resultContent.innerHTML = `
+                    <div class="result-item result-error">
+                        <strong>❌ 导航失败</strong><br>
+                        <strong>错误：</strong>${data.error}<br>
+                        <strong>步骤：</strong>${data.step}
+                    </div>
+                `;
+            }
+        }
+
+        // 打开导航
+        function openNavigation(url, mapService) {
+            try {
+                // 尝试在新窗口打开URL
+                const newWindow = window.open(url, '_blank');
+
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    // 如果新窗口打开失败，使用当前窗口
+                    window.location.href = url;
+                }
+
+                // 显示成功消息
+                alert(`${mapService === 'baidu_map' ? '百度地图' : '高德地图'}导航已启动！`);
+
+            } catch (error) {
+                console.error('打开导航失败:', error);
+                alert('无法自动打开地图应用，请手动复制URL在地图应用中打开');
+            }
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard(text) {
+            try {
+                navigator.clipboard.writeText(text).then(function() {
+                    alert('URL已复制到剪贴板');
+                }, function(err) {
+                    console.error('复制失败:', err);
+                    // 备用复制方法
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    alert('URL已复制到剪贴板');
+                });
+            } catch (error) {
+                console.error('复制失败:', error);
+                alert('复制失败，请手动复制URL');
+            }
+        }
+
+        // 回车键触发导航
+        document.getElementById('navInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                navigate();
+            }
+        });
+    </script>
+</body>
+</html>
