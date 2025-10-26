@@ -1,6 +1,18 @@
 {
   "permissions": {
+  "permissions": {
     "allow": [
+      "Bash(chmod 755:/workspace/start.sh)",
+      "Bash(python /workspace/main.py)",
+      "Bash(pip install -r /workspace/requirements.txt)"
+    ],
+    "deny": [],
+    "ask": [
+      "Bash(chmod:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)"
+    ]
+  }
       "Bash(chmod:*)",
       "Bash(python:*)",
       "Bash(pip install:*)"
