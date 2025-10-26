@@ -1,5 +1,7 @@
 import json
 import requests
+import urllib.parse
+import webbrowser
 from config import Config
 
 class MapMCPClient:
@@ -11,35 +13,35 @@ class MapMCPClient:
     async def call_tool(self, tool_name: str, parameters: dict) -> dict:
         """调用MCP工具"""
         try:
-            payload = {
-                "jsonrpc": "2.0",
-                "method": "tools/call",
-                "params": {
-                    "name": tool_name,
-                    "arguments": parameters
-                },
-                "id": 1
-            }
+            # 对于地图导航，通常是通过URL scheme打开本地地图应用
+            # 而不是通过HTTP API调用
 
-            response = requests.post(
-                self.base_url,
-                json=payload,
-                headers={"Content-Type": "application/json"},
-                timeout=30
-            )
+            if tool_name == "open_navigation":
+                # 构建地图导航URL
+                origin = parameters.get("origin", "")
+                destination = parameters.get("destination", "")
+                mode = parameters.get("mode", "transit")
 
-            if response.status_code != 200:
-                raise Exception(f"MCP调用失败: {response.status_code}")
-
-            result = response.json()
-            if "error" in result:
-                raise Exception(f"MCP工具错误: {result['error']}")
-
-            return result.get("result", {})
+                # 调用具体的导航实现
+                return await self._open_navigation(origin, destination, mode)
+            elif tool_name == "search_place":
+                # 搜索地点
+                query = parameters.get("query") or parameters.get("keywords", "")
+                return await self._search_place(query)
+            else:
+                raise Exception(f"不支持的MCP工具: {tool_name}")
 
         except Exception as e:
             print(f"MCP调用异常: {e}")
             raise
+
+    async def _open_navigation(self, origin: str, destination: str, mode: str) -> dict:
+        """打开导航 - 由子类实现"""
+        raise NotImplementedError("子类必须实现此方法")
+
+    async def _search_place(self, query: str) -> dict:
+        """搜索地点 - 由子类实现"""
+        raise NotImplementedError("子类必须实现此方法")
 
 class BaiduMapMCPClient(MapMCPClient):
     """百度地图MCP客户端"""
@@ -47,33 +49,85 @@ class BaiduMapMCPClient(MapMCPClient):
     def __init__(self):
         super().__init__(Config.BAIDU_MCP_URL)
 
-    async def open_navigation(self, origin: str, destination: str, mode: str = "transit") -> dict:
-        """
-        打开百度地图导航
+    async def open_navigation(self, origin: str, destination: str, mode: str) -> dict:
+        """打开导航 - 公共方法"""
+        return await self._open_navigation(origin, destination, mode)
 
-        Args:
-            origin: 起点地址
-            destination: 终点地址
-            mode: 交通模式 (driving, transit, walking, riding)
+    async def search_place(self, query: str) -> dict:
+        """搜索地点 - 公共方法"""
+        return await self._search_place(query)
 
-        Returns:
-            dict: 导航结果
-        """
-        parameters = {
-            "origin": origin,
-            "destination": destination,
-            "mode": mode
-        }
+    async def _open_navigation(self, origin: str, destination: str, mode: str) -> dict:
+        """打开百度地图导航"""
+        try:
+            # 百度地图URL scheme
+            # baidumap://map/direction?origin=起点&destination=终点&mode=交通方式
 
-        return await self.call_tool("open_navigation", parameters)
+            # 转换交通模式
+            mode_mapping = {
+                "driving": "driving",
+                "transit": "transit",
+                "walking": "walking",
+                "riding": "riding"
+            }
 
-    async def search_place(self, query: str, region: str = None) -> dict:
-        """搜索地点"""
-        parameters = {"query": query}
-        if region:
-            parameters["region"] = region
+            baidu_mode = mode_mapping.get(mode, "transit")
 
-        return await self.call_tool("search_place", parameters)
+            # 构建URL
+            url_params = {
+                "origin": origin,
+                "destination": destination,
+                "mode": baidu_mode,
+                "src": "AI导航助手"
+            }
+
+            query_string = urllib.parse.urlencode(url_params)
+            baidu_url = f"baidumap://map/direction?{query_string}"
+
+            print(f"打开百度地图导航: {baidu_url}")
+
+            # 尝试打开百度地图应用
+            try:
+                webbrowser.open(baidu_url)
+                return {
+                    "success": True,
+                    "message": f"已打开百度地图导航: {origin} -> {destination}",
+                    "url": baidu_url
+                }
+            except Exception as e:
+                # 如果无法直接打开，返回URL让用户手动打开
+                return {
+                    "success": False,
+                    "message": f"无法自动打开百度地图，请手动复制URL: {baidu_url}",
+                    "url": baidu_url,
+                    "error": str(e)
+                }
+
+        except Exception as e:
+            raise Exception(f"百度地图导航失败: {e}")
+
+    async def _search_place(self, query: str) -> dict:
+        """搜索百度地图地点"""
+        try:
+            # 百度地图搜索URL
+            url_params = {
+                "query": query,
+                "src": "AI导航助手"
+            }
+
+            query_string = urllib.parse.urlencode(url_params)
+            baidu_url = f"baidumap://map/search?{query_string}"
+
+            print(f"百度地图搜索: {baidu_url}")
+
+            return {
+                "success": True,
+                "message": f"已打开百度地图搜索: {query}",
+                "url": baidu_url
+            }
+
+        except Exception as e:
+            raise Exception(f"百度地图搜索失败: {e}")
 
 class AmapMCPClient(MapMCPClient):
     """高德地图MCP客户端"""
@@ -81,33 +135,87 @@ class AmapMCPClient(MapMCPClient):
     def __init__(self):
         super().__init__(Config.AMAP_MCP_URL)
 
-    async def open_navigation(self, origin: str, destination: str, mode: str = "bus") -> dict:
-        """
-        打开高德地图导航
+    async def open_navigation(self, origin: str, destination: str, mode: str) -> dict:
+        """打开导航 - 公共方法"""
+        return await self._open_navigation(origin, destination, mode)
 
-        Args:
-            origin: 起点地址
-            destination: 终点地址
-            mode: 交通模式 (car, bus, walk, ride)
+    async def search_place(self, query: str) -> dict:
+        """搜索地点 - 公共方法"""
+        return await self._search_place(query)
 
-        Returns:
-            dict: 导航结果
-        """
-        parameters = {
-            "origin": origin,
-            "destination": destination,
-            "mode": mode
-        }
+    async def _open_navigation(self, origin: str, destination: str, mode: str) -> dict:
+        """打开高德地图导航"""
+        try:
+            # 高德地图URL scheme
+            # amapuri://route/plan/?from=起点&to=终点&mode=交通方式
 
-        return await self.call_tool("open_navigation", parameters)
+            # 转换交通模式
+            mode_mapping = {
+                "driving": "0",  # 驾车
+                "transit": "1",  # 公交
+                "bus": "1",      # 公交
+                "walking": "2",  # 步行
+                "walk": "2",     # 步行
+                "ride": "3"      # 骑行
+            }
 
-    async def search_place(self, keywords: str, city: str = None) -> dict:
-        """搜索地点"""
-        parameters = {"keywords": keywords}
-        if city:
-            parameters["city"] = city
+            amap_mode = mode_mapping.get(mode, "1")  # 默认公交
 
-        return await self.call_tool("search_place", parameters)
+            # 构建URL
+            url_params = {
+                "from": origin,
+                "to": destination,
+                "mode": amap_mode,
+                "src": "AI导航助手"
+            }
+
+            query_string = urllib.parse.urlencode(url_params)
+            amap_url = f"amapuri://route/plan/?{query_string}"
+
+            print(f"打开高德地图导航: {amap_url}")
+
+            # 尝试打开高德地图应用
+            try:
+                webbrowser.open(amap_url)
+                return {
+                    "success": True,
+                    "message": f"已打开高德地图导航: {origin} -> {destination}",
+                    "url": amap_url
+                }
+            except Exception as e:
+                # 如果无法直接打开，返回URL让用户手动打开
+                return {
+                    "success": False,
+                    "message": f"无法自动打开高德地图，请手动复制URL: {amap_url}",
+                    "url": amap_url,
+                    "error": str(e)
+                }
+
+        except Exception as e:
+            raise Exception(f"高德地图导航失败: {e}")
+
+    async def _search_place(self, query: str) -> dict:
+        """搜索高德地图地点"""
+        try:
+            # 高德地图搜索URL
+            url_params = {
+                "keywords": query,
+                "src": "AI导航助手"
+            }
+
+            query_string = urllib.parse.urlencode(url_params)
+            amap_url = f"amapuri://poi?{query_string}"
+
+            print(f"高德地图搜索: {amap_url}")
+
+            return {
+                "success": True,
+                "message": f"已打开高德地图搜索: {query}",
+                "url": amap_url
+            }
+
+        except Exception as e:
+            raise Exception(f"高德地图搜索失败: {e}")
 
 class MapMCPService:
     """地图MCP服务层"""
