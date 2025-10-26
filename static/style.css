@@ -1,0 +1,34 @@
+/* 额外的样式文件，可根据需要扩展 */
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    .header {
+        padding: 20px;
+    }
+
+    .header h1 {
+        font-size: 2em;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .input-group {
+        flex-direction: column;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
